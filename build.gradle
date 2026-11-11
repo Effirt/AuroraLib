@@ -1,0 +1,92 @@
+plugins {
+    id("java")
+    id("maven-publish")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+group = "cd.cc.effirt"
+version = "${project.mod_version}"
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+    maven {
+        name = "Fabric"
+        url = "https://maven.fabricmc.net/"
+    }
+    maven {
+        name = "jitpack"
+        url = "https://jitpack.io"
+    }
+    maven {
+        name = "cursemaven"
+        url = "https://www.cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content {
+            includeGroup "maven.modrinth"
+        }
+    }
+    flatDir {
+        dirs "lib"
+    }
+}
+
+jar {
+    archiveBaseName.set("${project.mod_name}")
+    archiveClassifier.set("")
+    archiveVersion.set("${project.mod_version}")
+}
+
+processResources {
+    def modVersion = "${project.mod_minecraftVersion}-${project.mod_version}"
+    inputs.property "version", modVersion
+    filesMatching("fabric.mod.json") {
+        expand "version": modVersion
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifactId = project.mod_package
+
+            pom {
+                name = "${project.mod_name}"
+                description = "Effirt AuroraLib"
+                url = "https://github.com/Effirt/API"
+                licenses {
+                    license {
+                        name = "MIT"
+                    }
+                }
+                scm {
+                    url = "https://github.com/Effirt/AuroraLib"
+                    connection = "scm:git:https://github.com/Effirt/AuroraLib.git"
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Effirt/AuroraLib")
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+                password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+}

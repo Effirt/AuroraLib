@@ -1,0 +1,7 @@
+package cd.cc.effirt.auroralib.exception;
+
+public class LogException extends RuntimeException {
+    public LogException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
